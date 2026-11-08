@@ -1,0 +1,31 @@
+Je veux créer une application web 
+
+Cette application aura pour but de donner de la visibilité à mes actifs financiers
+Toutes mes entrées doivent être historisées et perdurées lors de la relance de l'application
+Je veux que cette application se connecte à des données de marché pour avoir le prix des actifs en temps réel
+
+Arriver sur l'application : 
+
+    - Overall : 
+        - action : 
+            - Déclarer un actif à la fin avec un bouton +
+            - Chercher un actif pour l'afficher en haut avant le top 5
+            - Capacité à séléctioner un actif ( highlight en bordure bleu)
+            - bouton de refresh de prix pour voir le prix actuel
+
+    - A gauche : 
+        - label :  Mes actifs, 
+        - fonction : voir le top 5 de mes actifs capacité 
+        - Display : 
+            - valeur en dollar
+            - quantité de l'actif
+            - part dans le portefeuille
+            - lieu de détention
+
+    - Au milieu : 
+        - graphique 1 : Stacked Bar chart repartition des actifs sur leur valeur actuelle
+        - graphique 2 : Stacked Bar chart repartition des actifs sur leur valeur initial
+    
+    - A Droite : 
+        - label : Opportunités
+        - fonction : Si l'actif sélectionné est vendu quelle quantité d'actifs entrée je pourrais avoir pour chaque actif, en top 5

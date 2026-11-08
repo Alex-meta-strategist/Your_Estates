@@ -1,4 +1,4 @@
-# Patrimony
+# Your Estates
 
 Application web locale qui donne de la visibilité sur vos actifs financiers : valeurs en dollars,
 cours de marché en temps réel, répartition du portefeuille et simulation d'arbitrages.
@@ -31,7 +31,9 @@ python server.py --db D:\patrimoine.db # autre fichier de données
 
 **En haut** : le bouton « Actualiser les prix » récupère les cours du moment. L'interrupteur
 « Auto » les actualise toutes les 60 secondes tant que l'onglet est visible. « Historique » ouvre
-le journal de toutes les saisies. Le dernier bouton bascule entre thème clair et sombre.
+le journal de toutes les saisies. Le bouton « EN » passe toute l'interface en anglais (puis « FR »
+pour revenir au français ; le choix est mémorisé dans le navigateur). Le dernier bouton bascule
+entre thème clair et sombre.
 
 **À gauche, « Mes actifs »**
 
@@ -46,9 +48,13 @@ le journal de toutes les saisies. Le dernier bouton bascule entre thème clair e
 **Au milieu**
 
 - La valeur totale du portefeuille, la plus-value depuis l'achat et la variation du jour.
-- Graphique 1 : barre empilée de la répartition selon la **valeur actuelle**.
-- Graphique 2 : barre empilée de la répartition selon la **valeur initiale** (prix d'achat).
-- Les deux graphiques montrent les 5 premiers actifs et regroupent le reste dans « Autres ».
+- Graphique 1 : barre empilée de la répartition **par plateforme** (lieu de détention).
+  Un clic sur une plateforme liste ses actifs dans la recherche.
+- Graphique 2 : barre empilée de la répartition selon la **valeur actuelle**.
+- Graphique 3 : barre empilée de la répartition selon la **valeur initiale** (prix d'achat).
+- Les lignes du même instrument ou portant le même nom (ex. BTC sur Binance et sur un Ledger)
+  sont regroupées en un seul bloc dans les graphiques 2 et 3.
+- Les graphiques montrent les 5 premières positions et regroupent le reste dans « Autres ».
   Un actif garde la même couleur partout. Survolez un bloc pour le détail, cliquez pour
   sélectionner l'actif. « Afficher le tableau » donne les montants exacts.
 

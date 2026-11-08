@@ -1,0 +1,6 @@
+# Données personnelles (base SQLite et fichiers temporaires associés)
+data/
+
+# Python
+__pycache__/
+*.pyc

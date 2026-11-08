@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Your Estates</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="/js/theme-init.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect class="bm-1" x="3" y="5" width="26" height="6" rx="2"/>
+          <rect class="bm-2" x="3" y="13" width="18" height="6" rx="2"/>
+          <rect class="bm-3" x="3" y="21" width="11" height="6" rx="2"/>
+        </svg>
+        <div>
+          <h1 class="brand-name">Your Estates</h1>
+          <p class="brand-tagline" data-en="My financial assets, valued in dollars">Mes actifs financiers, valorisés en dollars</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="refresh-status" id="refresh-status" aria-live="polite"></div>
+        <label class="toggle" title="Actualiser automatiquement les cours toutes les 60 secondes" data-en-title="Automatically refresh prices every 60 seconds">
+          <input type="checkbox" id="auto-refresh">
+          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+          <span>Auto</span>
+        </label>
+        <button type="button" class="btn btn-primary" id="refresh-btn">
+          <span class="btn-icon-slot" data-icon="refresh"></span><span data-en="Refresh prices">Actualiser les prix</span>
+        </button>
+        <button type="button" class="btn" id="history-btn">
+          <span class="btn-icon-slot" data-icon="history"></span><span data-en="History">Historique</span>
+        </button>
+        <button type="button" class="btn btn-lang" id="lang-btn" lang="en" aria-label="Switch the interface to English" title="English"
+                data-en-aria-label="Passer l'interface en français" data-en-title="Français">EN</button>
+        <button type="button" class="btn btn-square" id="theme-btn" aria-label="Basculer entre thème clair et sombre" title="Thème clair / sombre"
+                data-en-aria-label="Toggle light and dark theme" data-en-title="Light / dark theme">
+          <span class="btn-icon-slot" id="theme-icon"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="layout" id="layout">
+      <section class="card panel" id="assets-panel" aria-labelledby="assets-title">
+        <header class="panel-head">
+          <h2 id="assets-title" data-en="My assets">Mes actifs</h2>
+          <span class="panel-meta" id="assets-count"></span>
+        </header>
+        <div class="search">
+          <span class="search-icon" data-icon="search"></span>
+          <input type="search" id="asset-search-input" placeholder="Rechercher un actif…" autocomplete="off" spellcheck="false"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="asset-search-list"
+                 aria-label="Rechercher parmi mes actifs"
+                 data-en-placeholder="Search an asset…" data-en-aria-label="Search my assets">
+          <ul class="search-list" id="asset-search-list" role="listbox" aria-label="Actifs correspondants" data-en-aria-label="Matching assets" hidden></ul>
+        </div>
+        <div id="pinned-region"></div>
+        <div class="section-label" id="top-label">Top 5</div>
+        <ol class="asset-list" id="top-list"></ol>
+        <button type="button" class="more-hint" id="more-hint" hidden></button>
+        <button type="button" class="btn-add" id="add-asset-btn">
+          <span data-icon="plus"></span><span data-en="Declare an asset">Déclarer un actif</span>
+        </button>
+      </section>
+
+      <section class="col-middle" aria-label="Répartition du portefeuille" data-en-aria-label="Portfolio breakdown">
+        <div class="card hero" id="hero"></div>
+        <figure class="card chart" id="chart-platform"></figure>
+        <figure class="card chart" id="chart-current"></figure>
+        <figure class="card chart" id="chart-initial"></figure>
+      </section>
+
+      <section class="card panel" id="opps-panel" aria-labelledby="opps-title">
+        <header class="panel-head">
+          <h2 id="opps-title" data-en="Opportunities">Opportunités</h2>
+        </header>
+        <p class="panel-desc" data-en="If I sell the selected asset, how much of my other assets could I get?">Si je vends l'actif sélectionné, quelle quantité de mes autres actifs pourrais-je obtenir&nbsp;?</p>
+        <div id="sell-region"></div>
+        <div class="sell-ratio" id="sell-ratio-box" hidden>
+          <label for="sell-ratio" data-en="Share sold">Part vendue</label>
+          <input type="range" id="sell-ratio" min="1" max="100" step="1" value="100">
+          <output id="sell-ratio-out" for="sell-ratio">100 %</output>
+        </div>
+        <div id="sell-preview" hidden></div>
+        <div id="opps-region"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="dialog" id="asset-dialog" aria-labelledby="asset-dialog-title">
+    <form id="asset-form" class="dialog-frame" novalidate autocomplete="off">
+      <header class="dialog-head">
+        <h2 id="asset-dialog-title">Déclarer un actif</h2>
+        <button type="button" class="btn btn-square btn-ghost" data-close aria-label="Fermer" data-en-aria-label="Close"><span data-icon="close"></span></button>
+      </header>
+      <div class="dialog-body">
+        <div class="segmented" id="kind-tabs" role="radiogroup" aria-label="Type d'actif" data-en-aria-label="Asset type">
+          <button type="button" role="radio" data-kind="market" aria-checked="true" data-en="Stocks &amp; crypto">Bourse &amp; crypto</button>
+          <button type="button" role="radio" data-kind="cash" aria-checked="false" data-en="Cash">Liquidités</button>
+          <button type="button" role="radio" data-kind="manual" aria-checked="false" data-en="Other asset">Autre actif</button>
+        </div>
+
+        <div class="kind-section" data-section="market">
+          <div class="field" id="instrument-field">
+            <label class="field-label" for="instrument-query">Instrument</label>
+            <div class="search">
+              <span class="search-icon" data-icon="search"></span>
+              <input type="search" id="instrument-query" placeholder="Nom, ticker ou ISIN : Apple, MC.PA, bitcoin…" spellcheck="false"
+                     role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="instrument-results"
+                     data-en-placeholder="Name, ticker or ISIN: Apple, MC.PA, bitcoin…">
+              <ul class="search-list" id="instrument-results" role="listbox" aria-label="Instruments trouvés" data-en-aria-label="Instruments found" hidden></ul>
+            </div>
+            <p class="field-hint" data-en="Real-time or slightly delayed prices: Yahoo Finance (stocks, ETFs, currencies, commodities) and CoinGecko (crypto).">Cours en temps réel ou légèrement différés : Yahoo Finance (bourse, ETF, devises, matières premières) et CoinGecko (crypto).</p>
+          </div>
+          <div class="picked" id="instrument-picked" hidden></div>
+        </div>
+
+        <div class="kind-section" data-section="cash" hidden>
+          <div class="field">
+            <label class="field-label" for="cash-currency" data-en="Currency">Devise</label>
+            <select id="cash-currency"></select>
+            <p class="field-hint" data-en="Valued in dollars at the market exchange rate.">Valorisé en dollars au taux de change du marché.</p>
+          </div>
+        </div>
+
+        <div class="kind-section" data-section="manual" hidden>
+          <div class="field">
+            <label class="field-label" for="manual-price" data-en="Current unit value">Valeur unitaire actuelle</label>
+            <div class="input-group">
+              <input id="manual-price" inputmode="decimal" placeholder="ex. 350 000" data-en-placeholder="e.g. 350,000">
+              <select id="manual-currency" aria-label="Devise de la valeur unitaire" data-en-aria-label="Unit value currency"></select>
+            </div>
+            <p class="field-hint" data-en="For an unlisted asset (real estate, company shares, valuables…). Editable at any time.">Pour un actif sans cotation (immobilier, parts de société, objet de valeur…). Modifiable à tout moment.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field field-wide">
+            <label class="field-label" for="f-name" data-en="Display name">Nom affiché</label>
+            <input id="f-name" maxlength="120">
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-quantity" id="f-quantity-label">Quantité</label>
+            <input id="f-quantity" inputmode="decimal" placeholder="ex. 10">
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-category" data-en="Category">Catégorie</label>
+            <select id="f-category"></select>
+          </div>
+          <div class="field field-wide" id="initial-field">
+            <label class="field-label" for="f-initial-price" data-en="Unit purchase price">Prix d'achat unitaire</label>
+            <div class="input-group">
+              <input id="f-initial-price" inputmode="decimal">
+              <select id="f-initial-currency" aria-label="Devise du prix d'achat" data-en-aria-label="Purchase price currency"></select>
+            </div>
+            <p class="field-hint" id="initial-hint">Sert à calculer la valeur initiale. Prérempli avec le cours actuel.</p>
+          </div>
+          <div class="field field-wide">
+            <label class="field-label" for="f-location" data-en="Holding location">Lieu de détention</label>
+            <input id="f-location" list="location-options" maxlength="80" placeholder="ex. Boursorama, Binance, Ledger, ma banque…"
+                   data-en-placeholder="e.g. Boursorama, Binance, Ledger, my bank…">
+            <datalist id="location-options"></datalist>
+          </div>
+        </div>
+
+        <div class="form-preview" id="form-preview" aria-live="polite"></div>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </div>
+      <footer class="dialog-foot">
+        <button type="button" class="btn" data-close data-en="Cancel">Annuler</button>
+        <button type="submit" class="btn btn-primary" id="asset-submit">Ajouter l'actif</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="dialog dialog-wide" id="history-dialog" aria-labelledby="history-title">
+    <div class="dialog-frame">
+      <header class="dialog-head">
+        <h2 id="history-title" data-en="Entry history">Historique des entrées</h2>
+        <button type="button" class="btn btn-square btn-ghost" data-close aria-label="Fermer" data-en-aria-label="Close"><span data-icon="close"></span></button>
+      </header>
+      <div class="dialog-toolbar">
+        <label class="field-label" for="history-filter" data-en="Asset">Actif</label>
+        <select id="history-filter"><option value="" data-en="All assets">Tous les actifs</option></select>
+      </div>
+      <div class="dialog-body">
+        <ol class="timeline" id="history-list"></ol>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="dialog dialog-narrow" id="confirm-dialog" aria-labelledby="confirm-title">
+    <div class="dialog-frame">
+      <header class="dialog-head"><h2 id="confirm-title" data-en="Confirm">Confirmer</h2></header>
+      <div class="dialog-body"><p id="confirm-message"></p></div>
+      <footer class="dialog-foot">
+        <button type="button" class="btn" data-cancel data-en="Cancel">Annuler</button>
+        <button type="button" class="btn btn-danger" data-confirm data-en="Delete">Supprimer</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>
